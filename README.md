@@ -1,2 +1,2 @@
-# Result Replication
+# Particle Physics Result Replication
 ## Checkpoint #1
