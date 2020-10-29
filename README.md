@@ -1,1 +1,2 @@
-# result-replication
+# Result Replication
+## Checkpoint #1
