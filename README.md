@@ -15,4 +15,4 @@ This file contains the functions necessary for data extraction.
 This file successfully extracts the data.
 
 #### In order to run the file run.py, execute the following command:
-###### python run.py data
+##### python run.py data
