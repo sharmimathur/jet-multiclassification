@@ -1,9 +1,9 @@
 import sys
 import json
 
-from etl import get_features_labels
-
 sys.path.insert(0, 'src/data')
+
+from etl import get_features_labels
 
 def main(targets):
     if 'data' in targets:
