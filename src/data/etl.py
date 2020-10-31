@@ -4,7 +4,12 @@ from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
 import uproot
 
-def get_features_labels(file_name, remove_mass_pt_window=True, entrystop=None):
+def get_features_labels(file_name, features, spectators, labels, nlabels, remove_mass_pt_window=True, entrystop=None):
+    
+    nfeatures = len(features)
+    nspectators = len(spectators)
+    nlabels = 2
+    
     # load file
     root_file = uproot.open(file_name)
     tree = root_file['deepntuplizer/tree']
