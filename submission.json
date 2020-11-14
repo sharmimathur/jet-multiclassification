@@ -3,5 +3,5 @@
    "build": "run.py",
    "library": ["src"],
    "notebook": ["notebooks/sample.ipynb"],
-   "targets": ["target1","target2"]
+   "targets": ["run.py","src/data/etl.py"]
 }
