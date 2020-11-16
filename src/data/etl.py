@@ -37,8 +37,8 @@ def get_features_labels(file_name, features, spectators, labels, nlabels, remove
     label_array[:,1] = label_array_all['label_H_bb']
 
     
-    feature_array = clean_array(feature_array, spec_array, remove_mass_pt_window)
-    label_array = clean_array(label_array, spec_array, remove_mass_pt_window)
+    #feature_array = clean_array(feature_array, spec_array, remove_mass_pt_window)
+    #label_array = clean_array(label_array, spec_array, remove_mass_pt_window)
     # spec_array = clean_array(spec_array, spec_array, remove_mass_pt_window)
     
     return feature_array, label_array, spec_array, tree

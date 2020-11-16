@@ -29,7 +29,7 @@ with open('../../config/data-params.json') as fh:
     print(len(label_Hbb))
     
     jet_features = np.stack([jet_features[feat] for feat in ['fj_pt','fj_sdmass']],axis=1)
-    jet_features = clean_array(jet_features, specs, data_cfg['remove_mass_pt_window'])
+    #jet_features = clean_array(jet_features, specs, data_cfg['remove_mass_pt_window'])
     
     print(len(jet_features))
     
@@ -40,9 +40,9 @@ with open('../../config/data-params.json') as fh:
     plt.xlabel(r'Jet $p_{T}$ [GeV]')
     plt.ylabel('Fraction of jets')
     plt.legend()
-
-    plt.figure()
     plt.savefig('fig1.png')
+    
+    plt.figure()
 
     plt.hist(jet_features[:,1],weights=label_QCD,bins=np.linspace(0,300,101),density=True,alpha=0.7,label='QCD')
     plt.hist(jet_features[:,1],weights=label_Hbb,bins=np.linspace(0,300,101),density=True,alpha=0.7,label='H(bb)')
@@ -51,3 +51,4 @@ with open('../../config/data-params.json') as fh:
     plt.legend()
 
     plt.show()
+    plt.savefig('fig2.png')
