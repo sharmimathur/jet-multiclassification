@@ -21,6 +21,9 @@ def main(targets):
         
     if 'conv1d' in targets:
         create_models()
+        
+    if 'test' in targets:
+        main(['compare', 'conv1d'])
 
     return
 
