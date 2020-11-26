@@ -9,7 +9,9 @@ import uproot
 
 import yaml
 
-from DataGenerator import DataGenerator
+sys.path.insert(0, 'src/data')
+
+import DataGenerator
 
 sys.path.insert(0, '../data')
 

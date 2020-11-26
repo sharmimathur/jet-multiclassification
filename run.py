@@ -6,8 +6,9 @@ sys.path.insert(0, 'src/analysis')
 sys.path.insert(0, 'src/model')
 
 from etl import get_features_labels
-from analysis import compare
+import compare
 from model import create_models
+import test_run
 
 def main(targets):
     if 'data' in targets:
@@ -21,6 +22,9 @@ def main(targets):
         
     if 'conv1d' in targets:
         create_models()
+
+    if 'test' in targets:
+        test_run()
 
     return
 
