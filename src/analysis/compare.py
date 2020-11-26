@@ -10,8 +10,8 @@ sys.path.insert(0, '../data')
 
 from etl import get_features_labels, clean_array
 
-def compare():
-    with open('../../config/data-params.json') as fh:
+def compare(config_path):
+    with open(config_path) as fh:
         data_cfg = json.load(fh)
 
         data = get_features_labels(**data_cfg)
@@ -22,7 +22,7 @@ def compare():
 
         print(sum(label_QCD+label_Hbb)/len(label_QCD+label_Hbb))
 
-    with open('../../config/compare.json') as f:
+    with open('config/compare.json') as f:
 
         compare_cfg = json.load(f)
         jet_feat = compare_cfg['jet_features']
@@ -51,19 +51,18 @@ def compare():
 
 
 
-
-
-
+        vis_path = 'src/visualizations/'
 
         # TRACK FEATURES HISTOGRAMS DEPICTING DISCRIMINATORY EFFECT
         # number of tracks
         plt.figure()
+        print(type(track_features['track_pt']))
         plt.hist(track_features['track_pt'].counts,weights=label_QCD,bins=np.linspace(0,80,81),density=True,alpha=0.7,label='QCD')
         plt.hist(track_features['track_pt'].counts,weights=label_Hbb,bins=np.linspace(0,80,81),density=True,alpha=0.7,label='H(bb)')
         plt.xlabel('Number of tracks')
         plt.ylabel('Fraction of jets')
         plt.legend()
-        plt.savefig('../visualizations/trackcounts_hist.png')
+        plt.savefig(vis_path + 'trackcounts_hist.png')
 
         # max. relative track pt
         plt.figure()
@@ -72,7 +71,7 @@ def compare():
         plt.xlabel(r'Maximum relative track $p_{T}$')
         plt.ylabel('Fraction of jets')
         plt.legend()
-        plt.savefig('../visualizations/trackmaxrelpt_hist.png')
+        plt.savefig(vis_path + 'trackmaxrelpt_hist.png')
 
         # maximum signed 3D impact paramter value
         plt.figure()
@@ -81,7 +80,7 @@ def compare():
         plt.xlabel('Maximum signed 3D impact parameter value')
         plt.ylabel('Fraction of jets')
         plt.legend()
-        plt.savefig('../visualizations/tracksip3val_hist.png')
+        plt.savefig(vis_path + 'tracksip3val_hist.png')
 
         # maximum signed 3D impact paramter significance
         plt.figure()
@@ -90,7 +89,7 @@ def compare():
         plt.xlabel('Maximum signed 3D impact parameter significance')
         plt.ylabel('Fraction of jets')
         plt.legend()
-        plt.savefig('../visualizations/tracksip3sig_hist.png')
+        plt.savefig(vis_path + 'tracksip3sig_hist.png')
 
         plt.show()
 
@@ -102,7 +101,7 @@ def compare():
         plt.xlabel(r'Jet $p_{T}$ [GeV]')
         plt.ylabel('Fraction of jets')
         plt.legend()
-        plt.savefig('../visualizations/fj_pt_hist.png')
+        plt.savefig(vis_path + 'fj_pt_hist.png')
 
         plt.figure()
 
@@ -113,7 +112,7 @@ def compare():
         plt.legend()
 
         plt.show()
-        plt.savefig('../visualizations/fj_sdmass_hist.png')
+        plt.savefig(vis_path + 'fj_sdmass_hist.png')
 
 
 
@@ -124,7 +123,7 @@ def compare():
         plt.xlabel('SV pt Count')
         plt.ylabel('Fraction of jets')
         plt.legend()
-        plt.savefig('../visualizations/svptcounts_hist.png')
+        plt.savefig(vis_path + 'svptcounts_hist.png')
 
         plt.figure()
         plt.hist(sv_features['sv_mass'].counts,weights=label_QCD,bins=np.linspace(-2,40,51),density=True,alpha=0.7,label='QCD')
@@ -132,7 +131,7 @@ def compare():
         plt.xlabel('SV mass Count')
         plt.ylabel('Fraction of jets')
         plt.legend()
-        plt.savefig('../visualizations/svmasscounts_hist.png')
+        plt.savefig(vis_path + 'svmasscounts_hist.png')
 
 
 
@@ -153,7 +152,7 @@ def compare():
         plt.grid(True)
         plt.legend(loc='upper left')
         plt.show()
-        plt.savefig('../visualizations/svcount_roc.png')
+        plt.savefig(vis_path + 'svcount_roc.png')
 
 
         disc = np.nan_to_num(sv_features['sv_pt'].max()/jet_features['fj_pt'],nan=0)
@@ -171,5 +170,5 @@ def compare():
         plt.grid(True)
         plt.legend(loc='upper left')
         plt.show()
-        plt.savefig('../visualizations/maxsvpt-fjpt_roc.png')
+        plt.savefig(vis_path + 'maxsvpt-fjpt_roc.png')
     

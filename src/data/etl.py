@@ -12,7 +12,11 @@ def get_features_labels(file_name, features, spectators, labels, nlabels, remove
     
     # load file
     root_file = uproot.open(file_name)
-    tree = root_file['deepntuplizer/tree']
+    try:
+        tree = root_file['deepntuplizer/tree']
+    except:
+        tree = root_file['deepntuplizertree']
+        
     feature_array = tree.arrays(branches=features, 
                                 entrystop=entrystop,
                                 namedecode='utf-8')

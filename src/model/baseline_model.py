@@ -15,14 +15,14 @@ sys.path.insert(0, '../data')
 
 from generator import generator
 
-def create_models(config_path, model_config_path):
-    with open(config_path) as file:
+def create_baseline_model(config_path, model_config_path):
+    with open(config_path) as fh:
         try:
             # The FullLoader parameter handles the conversion from YAML
             # scalar values to Python the dictionary format
-            definitions = yaml.load(file, Loader=yaml.FullLoader)
+            definitions = yaml.load(fh, Loader=yaml.FullLoader)
         except:
-            definitions = json.load(file)
+            definitions = json.load(fh)
 
 
     features = definitions['features']
@@ -44,58 +44,19 @@ def create_models(config_path, model_config_path):
         remove_mass_pt_window = data_cfg["remove_mass_pt_window"]
         remove_unlabeled = data_cfg["remove_unlabeled"]
         max_entry = data_cfg['max_entry']
+        
+    
+    gen = DataGenerator([train_files], features, labels, spectators, batch_size=batch_size, n_dim=ntracks, 
+                                remove_mass_pt_window=remove_mass_pt_window, 
+                                remove_unlabeled=remove_unlabeled, max_entry=max_entry)
+    
+        
 
+    
 
-    train_generator, test_generator, val_generator = generator(train_files, test_files, val_files, features, labels, spectators, batch_size, ntracks, remove_mass_pt_window, remove_unlabeled, max_entry)
+#     train_generator, test_generator, val_generator = generator(train_files, test_files, val_files, features, labels, spectators, batch_size, ntracks, remove_mass_pt_window, remove_unlabeled, max_entry)
 
-
-    # FULLY CONNECTED NEURAL NET CLASSIFIER
-    from tensorflow.keras.models import Model
-    from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda
-    import tensorflow.keras.backend as K
-
-    # define dense keras model
-    inputs = Input(shape=(ntracks,nfeatures,), name = 'input')  
-    x = BatchNormalization(name='bn_1')(inputs)
-    x = Flatten(name='flatten_1')(x)
-    x = Dense(64, name = 'dense_1', activation='relu')(x)
-    x = Dense(32, name = 'dense_2', activation='relu')(x)
-    x = Dense(32, name = 'dense_3', activation='relu')(x)
-    outputs = Dense(nlabels, name = 'output', activation='softmax')(x)
-    keras_model_dense = Model(inputs=inputs, outputs=outputs)
-    keras_model_dense.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    print(keras_model_dense.summary())
-
-    # define callbacks
-    from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
-
-    early_stopping = EarlyStopping(monitor='val_loss', patience=5)
-    reduce_lr = ReduceLROnPlateau(patience=5,factor=0.5)
-    model_checkpoint = ModelCheckpoint('keras_model_dense_best.h5', monitor='val_loss', save_best_only=True)
-    callbacks = [early_stopping, model_checkpoint, reduce_lr]
-
-    # fit keras model
-    history_dense = keras_model_dense.fit_generator(train_generator, 
-                                                    validation_data = val_generator, 
-                                                    steps_per_epoch=len(train_generator), 
-                                                    validation_steps=len(val_generator),
-                                                    max_queue_size=5,
-                                                    epochs=20, 
-                                                    shuffle=False,
-                                                    callbacks = callbacks, 
-                                                    verbose=0)
-    # reload best weights
-    keras_model_dense.load_weights('keras_model_dense_best.h5')
-
-    plt.figure()
-    plt.plot(history_dense.history['loss'],label='Loss')
-    plt.plot(history_dense.history['val_loss'],label='Val. loss')
-    plt.xlabel('Epoch')
-    plt.legend()
-    plt.show()
-
-    plt.savefig('../visualizations/fcnn_loss.png')
-
+    
 
     from tensorflow.keras.models import Model
     from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda, GlobalAveragePooling1D
@@ -124,10 +85,10 @@ def create_models(config_path, model_config_path):
     callbacks = [early_stopping, model_checkpoint, reduce_lr]
 
     # fit keras model
-    history_conv1d = keras_model_conv1d.fit(train_generator, 
-                                            validation_data = val_generator, 
-                                            steps_per_epoch=len(train_generator), 
-                                            validation_steps=len(val_generator),
+    history_conv1d = keras_model_conv1d.fit(gen, 
+                                            validation_data = gen, 
+                                            steps_per_epoch=len(gen), 
+                                            validation_steps=len(gen),
                                             max_queue_size=5,
                                             epochs=20, 
                                             shuffle=False,
@@ -143,32 +104,35 @@ def create_models(config_path, model_config_path):
     plt.legend()
     plt.show()
 
-    plt.savefig('../visualizations/conv1d_loss.png')
+    plt.savefig('src/visualizations/conv1d_loss.png')
+    plt.savefig('test/conv1d_loss.png')
 
 
     # COMPARING MODELS
     predict_array_dnn = []
     predict_array_cnn = []
     label_array_test = []
+    
+    
+    test_gen = DataGenerator(definitions['file_name'], features, labels, spectators, batch_size=batch_size, n_dim=ntracks, 
+                                remove_mass_pt_window=remove_mass_pt_window, 
+                                remove_unlabeled=remove_unlabeled, max_entry=max_entry)
+    
 
-    for t in test_generator:
+    for t in gen:
         label_array_test.append(t[1])
-        predict_array_dnn.append(keras_model_dense.predict(t[0]))
         predict_array_cnn.append(keras_model_conv1d.predict(t[0]))
 
 
-    predict_array_dnn = np.concatenate(predict_array_dnn,axis=0)
     predict_array_cnn = np.concatenate(predict_array_cnn,axis=0)
     label_array_test = np.concatenate(label_array_test,axis=0)
 
 
     # create ROC curves
-    fpr_dnn, tpr_dnn, threshold_dnn = roc_curve(label_array_test[:,1], predict_array_dnn[:,1])
     fpr_cnn, tpr_cnn, threshold_cnn = roc_curve(label_array_test[:,1], predict_array_cnn[:,1])
 
     # plot ROC curves
     plt.figure()
-    plt.plot(tpr_dnn, fpr_dnn, lw=2.5, label="Dense, AUC = {:.1f}%".format(auc(fpr_dnn,tpr_dnn)*100))
     plt.plot(tpr_cnn, fpr_cnn, lw=2.5, label="Conv1D, AUC = {:.1f}%".format(auc(fpr_cnn,tpr_cnn)*100))
     plt.xlabel(r'True positive rate')
     plt.ylabel(r'False positive rate')
@@ -179,4 +143,5 @@ def create_models(config_path, model_config_path):
     plt.legend(loc='upper left')
     plt.show()
 
-    plt.savefig('../visualizations/fnn_vs_conv1d.png')
+    plt.savefig('src/visualizations/conv1d.png')
+    plt.savefig('test/conv1d.png')
