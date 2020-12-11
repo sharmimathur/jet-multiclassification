@@ -16,6 +16,8 @@ sys.path.insert(0, 'src/visualizations')
 
 from generator import generator
 from visualize import visualize
+from visualize import visualize_loss
+from visualize import visualize_roc
 
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda, GlobalAveragePooling1D
@@ -65,17 +67,9 @@ def create_baseline_model(features, spectators, labels, nfeatures, nspectators, 
     # reload best weights
     keras_model_conv1d.load_weights('keras_model_conv1d_best.h5')
 
-    plt.figure()
-    plt.plot(history_conv1d.history['loss'],label='Loss')
-    plt.plot(history_conv1d.history['val_loss'],label='Val. loss')
-    plt.xlabel('Epoch')
-    plt.legend()
-    plt.show()
-
-    #plt.savefig('data/visualizations/conv1d_loss.png')
+    visualize_loss(history_conv1d)
     visualize('conv1d_loss.png')
-    plt.savefig('test/conv1d_loss.png')
-
+    visualize('conv1d_loss.png', True)
 
     # COMPARING MODELS
     predict_array_dnn = []
@@ -102,17 +96,6 @@ def create_baseline_model(features, spectators, labels, nfeatures, nspectators, 
     fpr_cnn, tpr_cnn, threshold_cnn = roc_curve(label_array_test[:,1], predict_array_cnn[:,1])
 
     # plot ROC curves
-    plt.figure()
-    plt.plot(tpr_cnn, fpr_cnn, lw=2.5, label="Conv1D, AUC = {:.1f}%".format(auc(fpr_cnn,tpr_cnn)*100))
-    plt.xlabel(r'True positive rate')
-    plt.ylabel(r'False positive rate')
-    plt.semilogy()
-    plt.ylim(0.001,1)
-    plt.xlim(0,1)
-    plt.grid(True)
-    plt.legend(loc='upper left')
-    plt.show()
-
-    #plt.savefig('data/visualizations/conv1d.png')
+    visualize_roc(fpr_cnn, tpr_cnn)
     visualize('conv1d.png')
-    plt.savefig('test/conv1d.png')
+    visualize('conv1d.png', True)

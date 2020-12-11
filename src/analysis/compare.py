@@ -11,6 +11,8 @@ sys.path.insert(0, 'src/visualizations')
 
 from etl import get_features_labels, clean_array
 from visualize import visualize
+from visualize import visualize_hist
+from visualize import visualize_roc_compare
 
 def compare(config_path):
     with open(config_path) as fh:
@@ -57,91 +59,73 @@ def compare(config_path):
 
         # TRACK FEATURES HISTOGRAMS DEPICTING DISCRIMINATORY EFFECT
         # number of tracks
-        plt.figure()
-        print(type(track_features['track_pt']))
-        plt.hist(track_features['track_pt'].counts,weights=label_QCD,bins=np.linspace(0,80,81),density=True,alpha=0.7,label='QCD')
-        plt.hist(track_features['track_pt'].counts,weights=label_Hbb,bins=np.linspace(0,80,81),density=True,alpha=0.7,label='H(bb)')
-        plt.xlabel('Number of tracks')
-        plt.ylabel('Fraction of jets')
-        plt.legend()
-        #plt.savefig(vis_path + 'trackcounts_hist.png')
+        data = track_features['track_pt'].counts
+        bin_vars = np.linspace(0,80,81)
+        x_label = 'Number of tracks'
+        y_label = 'Fraction of jets'
+        file_name = 'trackcounts_hist.png'
+        visualize_hist(data, label_QCD, label_Hbb, bin_vars, x_label, y_label)
         visualize('trackcounts_hist.png')
 
         # max. relative track pt
-        plt.figure()
-        plt.hist(track_features['track_pt'].max()/jet_features['fj_pt'],weights=label_QCD,bins=np.linspace(0,0.5,51),density=True,alpha=0.7,label='QCD')
-        plt.hist(track_features['track_pt'].max()/jet_features['fj_pt'],weights=label_Hbb,bins=np.linspace(0,0.5,51),density=True,alpha=0.7,label='H(bb)')
-        plt.xlabel(r'Maximum relative track $p_{T}$')
-        plt.ylabel('Fraction of jets')
-        plt.legend()
-        #plt.savefig(vis_path + 'trackmaxrelpt_hist.png')
+        data = track_features['track_pt'].max()/jet_features['fj_pt']
+        bin_vars = np.linspace(0,0.5,51)
+        x_label = r'Maximum relative track $p_{T}$'
+        y_label = 'Fraction of jets'
+        visualize_hist(data, label_QCD, label_Hbb, bin_vars, x_label, y_label)
         visualize('trackmaxrelpt_hist.png')
 
+        
         # maximum signed 3D impact paramter value
-        plt.figure()
-        plt.hist(track_features['trackBTag_Sip3dVal'].max(),weights=label_QCD,bins=np.linspace(-2,40,51),density=True,alpha=0.7,label='QCD')
-        plt.hist(track_features['trackBTag_Sip3dVal'].max(),weights=label_Hbb,bins=np.linspace(-2,40,51),density=True,alpha=0.7,label='H(bb)')
-        plt.xlabel('Maximum signed 3D impact parameter value')
-        plt.ylabel('Fraction of jets')
-        plt.legend()
-        #plt.savefig(vis_path + 'tracksip3val_hist.png')
+        data = track_features['trackBTag_Sip3dVal'].max()
+        bin_vars = np.linspace(-2,40,51)
+        x_label = 'Maximum signed 3D impact parameter value'
+        y_label = 'Fraction of jets'
+        visualize_hist(data, label_QCD, label_Hbb, bin_vars, x_label, y_label)
         visualize('tracksip3val_hist.png')
 
+        
         # maximum signed 3D impact paramter significance
-        plt.figure()
-        plt.hist(track_features['trackBTag_Sip3dSig'].max(),weights=label_QCD,bins=np.linspace(-2,200,51),density=True,alpha=0.7,label='QCD')
-        plt.hist(track_features['trackBTag_Sip3dSig'].max(),weights=label_Hbb,bins=np.linspace(-2,200,51),density=True,alpha=0.7,label='H(bb)')
-        plt.xlabel('Maximum signed 3D impact parameter significance')
-        plt.ylabel('Fraction of jets')
-        plt.legend()
-        #plt.savefig(vis_path + 'tracksip3sig_hist.png')
+        data = track_features['trackBTag_Sip3dSig'].max()
+        bin_vars = np.linspace(-2,40,51)
+        x_label = 'Maximum signed 3D impact parameter value'
+        y_label = 'Fraction of jets'
+        visualize_hist(data, label_QCD, label_Hbb, bin_vars, x_label, y_label)
         visualize('tracksip3sig_hist.png')
-
-        plt.show()
-
 
 
         # JET FEATURES HISTOGRAMS DEPICTING DISCRIMINATORY EFFECT
-        plt.hist(jet_features['fj_pt'],weights=label_QCD,bins=np.linspace(0,4000,101),density=True,alpha=0.7,label='QCD')
-        plt.hist(jet_features['fj_pt'],weights=label_Hbb,bins=np.linspace(0,4000,101),density=True,alpha=0.7,label='H(bb)')
-        plt.xlabel(r'Jet $p_{T}$ [GeV]')
-        plt.ylabel('Fraction of jets')
-        plt.legend()
-        #plt.savefig(vis_path + 'fj_pt_hist.png')
+        data = jet_features['fj_pt']
+        bin_vars = np.linspace(0,4000,101)
+        x_label = r'Jet $p_{T}$ [GeV]'
+        y_label = 'Fraction of jets'
+        visualize_hist(data, label_QCD, label_Hbb, bin_vars, x_label, y_label)
         visualize('fj_pt_hist.png')
-
-        plt.figure()
-
-        plt.hist(jet_features['fj_sdmass'],weights=label_QCD,bins=np.linspace(0,300,101),density=True,alpha=0.7,label='QCD')
-        plt.hist(jet_features['fj_sdmass'],weights=label_Hbb,bins=np.linspace(0,300,101),density=True,alpha=0.7,label='H(bb)')
-        plt.xlabel(r'Jet $m_{SD}$ [GeV]')
-        plt.ylabel('Fraction of jets')
-        plt.legend()
-
-        plt.show()
-        #plt.savefig(vis_path + 'fj_sdmass_hist.png')
+        
+        
+        data = jet_features['fj_sdmass']
+        bin_vars = np.linspace(0,300,101)
+        x_label = r'Jet $m_{SD}$ [GeV]'
+        y_label = 'Fraction of jets'
+        visualize_hist(data, label_QCD, label_Hbb, bin_vars, x_label, y_label)
         visualize('fj_sdmass_hist.png')
-
+        
 
         # SV FEATURES HISTOGRAMS DEPICTING DISCRIMINATORY EFFECT
-        plt.figure()
-        plt.hist(sv_features['sv_pt'].counts,weights=label_QCD,bins=np.linspace(-2,40,51),density=True,alpha=0.7,label='QCD')
-        plt.hist(sv_features['sv_pt'].counts,weights=label_Hbb,bins=np.linspace(-2,40,51),density=True,alpha=0.7,label='H(bb)')
-        plt.xlabel('SV pt Count')
-        plt.ylabel('Fraction of jets')
-        plt.legend()
-        #plt.savefig(vis_path + 'svptcounts_hist.png')
+        data = sv_features['sv_pt'].counts
+        bin_vars = np.linspace(-2,40,51)
+        x_label = 'SV pt Count'
+        y_label = 'Fraction of jets'
+        visualize_hist(data, label_QCD, label_Hbb, bin_vars, x_label, y_label)
         visualize('svptcounts_hist.png')
 
-        plt.figure()
-        plt.hist(sv_features['sv_mass'].counts,weights=label_QCD,bins=np.linspace(-2,40,51),density=True,alpha=0.7,label='QCD')
-        plt.hist(sv_features['sv_mass'].counts,weights=label_Hbb,bins=np.linspace(-2,40,51),density=True,alpha=0.7,label='H(bb)')
-        plt.xlabel('SV mass Count')
-        plt.ylabel('Fraction of jets')
-        plt.legend()
-        #plt.savefig(vis_path + 'svmasscounts_hist.png')
-        visualize('svmasscounts_hist.png')
 
+        data = sv_features['sv_mass'].counts
+        bin_vars = np.linspace(-2,40,51)
+        x_label = 'SV mass Count'
+        y_label = 'Fraction of jets'
+        visualize_hist(data, label_QCD, label_Hbb, bin_vars, x_label, y_label)
+        visualize('svmasscounts_hist.png')
 
 
         # ROC CURVES
@@ -150,35 +134,13 @@ def compare(config_path):
 
         fpr, tpr, threshold = roc_curve(label_Hbb, disc)
         # plot ROC curve
-        plt.figure()
-        plt.plot(fpr, tpr, lw=2.5, label="AUC = {:.1f}%".format(auc(fpr,tpr)*100))
-        plt.xlabel(r'False positive rate')
-        plt.ylabel(r'True positive rate')
-        #plt.semilogy()
-        plt.ylim(0,1)
-        plt.xlim(0,1)
-        plt.plot([0, 1], [0, 1], lw=2.5, label='Random, AUC = 50.0%')
-        plt.grid(True)
-        plt.legend(loc='upper left')
-        plt.show()
-        #plt.savefig(vis_path + 'svcount_roc.png')
+        visualize_roc_compare(fpr, tpr)
         visualize('svcount_roc.png')
 
-
+        
         disc = np.nan_to_num(sv_features['sv_pt'].max()/jet_features['fj_pt'],nan=0)
 
         fpr, tpr, threshold = roc_curve(label_Hbb, disc)
         # plot ROC curve
-        plt.figure()
-        plt.plot(fpr, tpr, lw=2.5, label="AUC = {:.1f}%".format(auc(fpr,tpr)*100))
-        plt.xlabel(r'False positive rate')
-        plt.ylabel(r'True positive rate')
-        #plt.semilogy()
-        plt.ylim(0,1)
-        plt.xlim(0,1)
-        plt.plot([0, 1], [0, 1], lw=2.5, label='Random, AUC = 50.0%')
-        plt.grid(True)
-        plt.legend(loc='upper left')
-        plt.show()
-        #plt.savefig(vis_path + 'maxsvpt-fjpt_roc.png')
+        visualize_roc_compare(fpr, tpr)
         visualize('maxsvpt-fjpt_roc.png')
