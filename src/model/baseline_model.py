@@ -17,57 +17,23 @@ sys.path.insert(0, 'src/visualizations')
 from generator import generator
 from visualize import visualize
 
-def create_baseline_model(config_path, model_config_path):
-    with open(config_path) as fh:
-        try:
-            # The FullLoader parameter handles the conversion from YAML
-            # scalar values to Python the dictionary format
-            definitions = yaml.load(fh, Loader=yaml.FullLoader)
-        except:
-            definitions = json.load(fh)
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda, GlobalAveragePooling1D
+import tensorflow.keras.backend as K
+    
+def create_baseline_model(features, spectators, labels, nfeatures, nspectators, nlabels, ntracks, sample_test_files, train_files, test_files, val_files, batch_size, remove_mass_pt_window, remove_unlabeled, max_entry):
 
-
-    features = definitions['features']
-    spectators = definitions['spectators']
-    labels = definitions['labels']
-
-    nfeatures = definitions['nfeatures']
-    nspectators = definitions['nspectators']
-    nlabels = definitions['nlabels']
-    ntracks = definitions['ntracks']
-
-    with open(model_config_path) as fh:
-        data_cfg = json.load(fh)
-        train_files = data_cfg['train_file_name']
-        test_files = data_cfg['test_file_name']
-        val_files = data_cfg['val_file_name']
-
-        batch_size = data_cfg["batch_size"]
-        remove_mass_pt_window = data_cfg["remove_mass_pt_window"]
-        remove_unlabeled = data_cfg["remove_unlabeled"]
-        max_entry = data_cfg['max_entry']
-        
     
     gen = DataGenerator([train_files], features, labels, spectators, batch_size=batch_size, n_dim=ntracks, 
                                 remove_mass_pt_window=remove_mass_pt_window, 
                                 remove_unlabeled=remove_unlabeled, max_entry=max_entry)
     
-        
-
-    
-
-#     train_generator, test_generator, val_generator = generator(train_files, test_files, val_files, features, labels, spectators, batch_size, ntracks, remove_mass_pt_window, remove_unlabeled, max_entry)
-
-    
-
-    from tensorflow.keras.models import Model
-    from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda, GlobalAveragePooling1D
-    import tensorflow.keras.backend as K
+             
 
     # define Deep Sets model with Conv1D Keras layer
     inputs = Input(shape=(ntracks,nfeatures,), name = 'input')  
     x = BatchNormalization(name='bn_1')(inputs)
-    x = Conv1D(64, 1, strides=1, padding='same', name = 'conv1d_1', activation='relu')(x)
+#     x = Conv1D(64, 1, strides=1, padding='same', name = 'conv1d_1', activation='relu')(x)
     x = Conv1D(32, 1, strides=1, padding='same', name = 'conv1d_2', activation='relu')(x)
     x = Conv1D(32, 1, strides=1, padding='same', name = 'conv1d_3', activation='relu')(x)
     # sum over tracks
@@ -86,13 +52,13 @@ def create_baseline_model(config_path, model_config_path):
     model_checkpoint = ModelCheckpoint('keras_model_conv1d_best.h5', monitor='val_loss', save_best_only=True)
     callbacks = [early_stopping, model_checkpoint, reduce_lr]
 
-    # fit keras model
+    # fit keras model, from 20 epochs to 300
     history_conv1d = keras_model_conv1d.fit(gen, 
                                             validation_data = gen, 
                                             steps_per_epoch=len(gen), 
                                             validation_steps=len(gen),
                                             max_queue_size=5,
-                                            epochs=20, 
+                                            epochs=300, 
                                             shuffle=False,
                                             callbacks = callbacks, 
                                             verbose=0)
@@ -117,16 +83,17 @@ def create_baseline_model(config_path, model_config_path):
     label_array_test = []
     
     
-    test_gen = DataGenerator(definitions['file_name'], features, labels, spectators, batch_size=batch_size, n_dim=ntracks, 
+    test_gen = DataGenerator(sample_test_files, features, labels, spectators, batch_size=batch_size, n_dim=ntracks, 
                                 remove_mass_pt_window=remove_mass_pt_window, 
                                 remove_unlabeled=remove_unlabeled, max_entry=max_entry)
     
-
+    
     for t in gen:
         label_array_test.append(t[1])
         predict_array_cnn.append(keras_model_conv1d.predict(t[0]))
-
-
+        
+        
+    
     predict_array_cnn = np.concatenate(predict_array_cnn,axis=0)
     label_array_test = np.concatenate(label_array_test,axis=0)
 

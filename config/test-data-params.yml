@@ -71,5 +71,5 @@ nlabels: 2
 # we're going to zero-pad up to 60 tracks
 ntracks: 60
 
-file_name:
+sample_test_files:
  - test/testdata/test.root

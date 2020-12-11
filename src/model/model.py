@@ -17,44 +17,29 @@ sys.path.insert(0, 'src/visualizations')
 from generator import generator
 from visualize import visualize
 
-def create_models(config_path, model_config_path):
-    with open(config_path) as file:
-        try:
-            # The FullLoader parameter handles the conversion from YAML
-            # scalar values to Python the dictionary format
-            definitions = yaml.load(file, Loader=yaml.FullLoader)
-        except:
-            definitions = json.load(file)
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda
+import tensorflow.keras.backend as K
+
+def create_models(features, spectators, labels, nfeatures, nspectators, nlabels, ntracks, train_files, test_files, val_files, batch_size, remove_mass_pt_window, remove_unlabeled, max_entry):
 
 
-    features = definitions['features']
-    spectators = definitions['spectators']
-    labels = definitions['labels']
-
-    nfeatures = definitions['nfeatures']
-    nspectators = definitions['nspectators']
-    nlabels = definitions['nlabels']
-    ntracks = definitions['ntracks']
-
-    with open(model_config_path) as fh:
-        data_cfg = json.load(fh)
-        train_files = data_cfg['train_file_name']
-        test_files = data_cfg['test_file_name']
-        val_files = data_cfg['val_file_name']
-
-        batch_size = data_cfg["batch_size"]
-        remove_mass_pt_window = data_cfg["remove_mass_pt_window"]
-        remove_unlabeled = data_cfg["remove_unlabeled"]
-        max_entry = data_cfg['max_entry']
-
-
-    train_generator, test_generator, val_generator = generator(train_files, test_files, val_files, features, labels, spectators, batch_size, ntracks, remove_mass_pt_window, remove_unlabeled, max_entry)
+    train_generator = DataGenerator([train_files], features, labels, spectators, batch_size=batch_size, n_dim=ntracks, 
+                                remove_mass_pt_window=remove_mass_pt_window, 
+                                remove_unlabeled=remove_unlabeled, max_entry=max_entry)
+    
+    val_generator = DataGenerator([val_files], features, labels, spectators, batch_size=batch_size, n_dim=ntracks, 
+                                remove_mass_pt_window=remove_mass_pt_window, 
+                                remove_unlabeled=remove_unlabeled, max_entry=max_entry)
+    
+    test_generator = DataGenerator([test_files], features, labels, spectators, batch_size=batch_size, n_dim=ntracks, 
+                                remove_mass_pt_window=remove_mass_pt_window, 
+                                remove_unlabeled=remove_unlabeled, max_entry=max_entry)
+    
 
 
     # FULLY CONNECTED NEURAL NET CLASSIFIER
-    from tensorflow.keras.models import Model
-    from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda
-    import tensorflow.keras.backend as K
+    
 
     # define dense keras model
     inputs = Input(shape=(ntracks,nfeatures,), name = 'input')  
@@ -172,10 +157,10 @@ def create_models(config_path, model_config_path):
 
     # plot ROC curves
     plt.figure()
-    plt.plot(tpr_dnn, fpr_dnn, lw=2.5, label="Dense, AUC = {:.1f}%".format(auc(fpr_dnn,tpr_dnn)*100))
-    plt.plot(tpr_cnn, fpr_cnn, lw=2.5, label="Conv1D, AUC = {:.1f}%".format(auc(fpr_cnn,tpr_cnn)*100))
-    plt.xlabel(r'True positive rate')
-    plt.ylabel(r'False positive rate')
+    plt.plot(fpr_dnn, tpr_dnn, lw=2.5, label="Dense, AUC = {:.1f}%".format(auc(fpr_dnn,tpr_dnn)*100))
+    plt.plot(fpr_cnn, tpr_cnn, lw=2.5, label="Conv1D, AUC = {:.1f}%".format(auc(fpr_cnn,tpr_cnn)*100))
+    plt.xlabel(r'False positive rate')
+    plt.ylabel(r'True positive rate')
     plt.semilogy()
     plt.ylim(0.001,1)
     plt.xlim(0,1)

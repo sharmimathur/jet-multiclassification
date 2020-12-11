@@ -1,5 +1,6 @@
 import sys
 import json
+import yaml
 
 sys.path.insert(0, 'src/data')
 sys.path.insert(0, 'src/analysis')
@@ -21,11 +22,29 @@ def main(targets):
         compare('config/data-params.json')
         
     if 'conv1d' in targets:
-        create_models('config/data-params.yml','config/model-params.json')
+        with open('config/data-params.yml') as file:
+            # The FullLoader parameter handles the conversion from YAML
+#                 # scalar values to Python the dictionary format
+            definitions = yaml.load(file, Loader=yaml.FullLoader)
+
+                
+        with open('config/model-params.json') as fh:
+            data_cfg = json.load(fh)
+        create_models(**definitions, **data_cfg)
+        #create_models('config/data-params.yml','config/model-params.json')
         
     if 'test' in targets:
+        with open('config/test-data-params.yml') as file:
+            # The FullLoader parameter handles the conversion from YAML
+#                 # scalar values to Python the dictionary format
+            definitions = yaml.load(file, Loader=yaml.FullLoader)
+
+                
+        with open('config/model-params.json') as fh:
+            data_cfg = json.load(fh)
+        create_baseline_model(**definitions, **data_cfg)
         #compare('config/test-data-params.json')
-        create_baseline_model('config/test-data-params.yml','config/model-params.json')
+        #create_baseline_model('config/test-data-params.yml','config/model-params.json')
 
     return
 
