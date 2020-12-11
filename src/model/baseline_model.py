@@ -12,8 +12,10 @@ import yaml
 from DataGenerator import DataGenerator
 
 sys.path.insert(0, '../data')
+sys.path.insert(0, '../visualizations')
 
 from generator import generator
+from visualize import visualize
 
 def create_baseline_model(config_path, model_config_path):
     with open(config_path) as fh:
