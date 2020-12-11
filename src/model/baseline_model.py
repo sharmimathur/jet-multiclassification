@@ -12,7 +12,7 @@ import yaml
 from DataGenerator import DataGenerator
 
 sys.path.insert(0, '../data')
-sys.path.insert(0, '../visualizations')
+sys.path.insert(0, 'src/visualizations')
 
 from generator import generator
 from visualize import visualize
@@ -106,7 +106,8 @@ def create_baseline_model(config_path, model_config_path):
     plt.legend()
     plt.show()
 
-    plt.savefig('src/visualizations/conv1d_loss.png')
+    #plt.savefig('data/visualizations/conv1d_loss.png')
+    visualize('conv1d_loss.png')
     plt.savefig('test/conv1d_loss.png')
 
 
@@ -145,5 +146,6 @@ def create_baseline_model(config_path, model_config_path):
     plt.legend(loc='upper left')
     plt.show()
 
-    plt.savefig('src/visualizations/conv1d.png')
+    #plt.savefig('data/visualizations/conv1d.png')
+    visualize('conv1d.png')
     plt.savefig('test/conv1d.png')

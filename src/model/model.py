@@ -12,8 +12,10 @@ import yaml
 from DataGenerator import DataGenerator
 
 sys.path.insert(0, '../data')
+sys.path.insert(0, 'src/visualizations')
 
 from generator import generator
+from visualize import visualize
 
 def create_models(config_path, model_config_path):
     with open(config_path) as file:
@@ -94,7 +96,8 @@ def create_models(config_path, model_config_path):
     plt.legend()
     plt.show()
 
-    plt.savefig('../visualizations/fcnn_loss.png')
+    #plt.savefig('data/visualizations/fcnn_loss.png')
+    visualize('fcnn_loss.png')
 
 
     from tensorflow.keras.models import Model
@@ -143,7 +146,8 @@ def create_models(config_path, model_config_path):
     plt.legend()
     plt.show()
 
-    plt.savefig('../visualizations/conv1d_loss.png')
+    #plt.savefig('data/visualizations/conv1d_loss.png')
+    visualize('conv1d_loss.png')
 
 
     # COMPARING MODELS
@@ -179,4 +183,5 @@ def create_models(config_path, model_config_path):
     plt.legend(loc='upper left')
     plt.show()
 
-    plt.savefig('../visualizations/fnn_vs_conv1d.png')
+    #plt.savefig('data/visualizations/fnn_vs_conv1d.png')
+    visualize('fnn_vs_conv1d.png')
