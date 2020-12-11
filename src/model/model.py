@@ -157,10 +157,10 @@ def create_models(features, spectators, labels, nfeatures, nspectators, nlabels,
 
     # plot ROC curves
     plt.figure()
-    plt.plot(fpr_dnn, tpr_dnn, lw=2.5, label="Dense, AUC = {:.1f}%".format(auc(fpr_dnn,tpr_dnn)*100))
-    plt.plot(fpr_cnn, tpr_cnn, lw=2.5, label="Conv1D, AUC = {:.1f}%".format(auc(fpr_cnn,tpr_cnn)*100))
-    plt.xlabel(r'False positive rate')
-    plt.ylabel(r'True positive rate')
+    plt.plot(tpr_dnn, fpr_dnn, lw=2.5, label="Dense, AUC = {:.1f}%".format(auc(fpr_dnn,tpr_dnn)*100))
+    plt.plot(tpr_cnn, fpr_cnn, lw=2.5, label="Conv1D, AUC = {:.1f}%".format(auc(fpr_cnn,tpr_cnn)*100))
+    plt.xlabel(r'True positive rate')
+    plt.ylabel(r'False positive rate')
     plt.semilogy()
     plt.ylim(0.001,1)
     plt.xlim(0,1)
