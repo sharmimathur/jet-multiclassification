@@ -1,7 +1,9 @@
 import sys
 import json
+import numpy as np
 
 import tensorflow.keras as keras
+from tensorflow import set_random_seed
 import numpy as np
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
@@ -17,6 +19,9 @@ sys.path.insert(0, 'src/visualizations')
 from generator import generator
 from visualize import visualize
 
+#setting seeds for consistent results
+np.random.seed(1)
+set_random_seed(2)
 
 def create_models(features, spectators, labels, nfeatures, nspectators, nlabels, ntracks, train_files, test_files, val_files, batch_size, remove_mass_pt_window, remove_unlabeled, max_entry):
 
@@ -89,6 +94,7 @@ def create_models(features, spectators, labels, nfeatures, nspectators, nlabels,
     from tensorflow.keras.models import Model
     from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda, GlobalAveragePooling1D
     import tensorflow.keras.backend as K
+    
 
     # define Deep Sets model with Conv1D Keras layer
     inputs = Input(shape=(ntracks,nfeatures,), name = 'input')  
@@ -99,6 +105,8 @@ def create_models(features, spectators, labels, nfeatures, nspectators, nlabels,
     # sum over tracks
     x = GlobalAveragePooling1D(name='pool_1')(x)
     x = Dense(100, name = 'dense_1', activation='relu')(x)
+    x = Dense(64, name = 'dense_2', activation='relu')(x)
+    x = Dense(32, name = 'dense_3', activation='relu')(x)
     outputs = Dense(nlabels, name = 'output', activation='softmax')(x)
     
     keras_model_conv1d = Model(inputs=inputs, outputs=outputs)
