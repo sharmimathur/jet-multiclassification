@@ -17,9 +17,7 @@ sys.path.insert(0, 'src/visualizations')
 from generator import generator
 from visualize import visualize
 
-from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda, GlobalAveragePooling1D
-import tensorflow.keras.backend as K
+
     
 def create_baseline_model(features, spectators, labels, nfeatures, nspectators, nlabels, ntracks, sample_test_files, train_files, test_files, val_files, batch_size, remove_mass_pt_window, remove_unlabeled, max_entry):
 
@@ -28,6 +26,9 @@ def create_baseline_model(features, spectators, labels, nfeatures, nspectators, 
                                 remove_mass_pt_window=remove_mass_pt_window, 
                                 remove_unlabeled=remove_unlabeled, max_entry=max_entry)
     
+    from tensorflow.keras.models import Model
+    from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda, GlobalAveragePooling1D
+    import tensorflow.keras.backend as K
              
 
     # define Deep Sets model with Conv1D Keras layer

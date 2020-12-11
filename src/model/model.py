@@ -17,9 +17,6 @@ sys.path.insert(0, 'src/visualizations')
 from generator import generator
 from visualize import visualize
 
-from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda
-import tensorflow.keras.backend as K
 
 def create_models(features, spectators, labels, nfeatures, nspectators, nlabels, ntracks, train_files, test_files, val_files, batch_size, remove_mass_pt_window, remove_unlabeled, max_entry):
 
@@ -36,6 +33,10 @@ def create_models(features, spectators, labels, nfeatures, nspectators, nlabels,
                                 remove_mass_pt_window=remove_mass_pt_window, 
                                 remove_unlabeled=remove_unlabeled, max_entry=max_entry)
     
+    
+    from tensorflow.keras.models import Model
+    from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda
+    import tensorflow.keras.backend as K
 
 
     # FULLY CONNECTED NEURAL NET CLASSIFIER
