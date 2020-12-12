@@ -16,13 +16,19 @@ sys.path.insert(0, 'src/visualizations')
 
 from generator import generator
 from visualize import visualize
+from visualize import visualize_loss
+from visualize import visualize_roc
 
 
     
-def create_baseline_model(features, spectators, labels, nfeatures, nspectators, nlabels, ntracks, sample_test_files, train_files, test_files, val_files, batch_size, remove_mass_pt_window, remove_unlabeled, max_entry):
+def create_baseline_model(features, spectators, labels, nfeatures, nspectators, nlabels, ntracks, sample_test_files, train_files, test_files, val_files, batch_size, remove_mass_pt_window, remove_unlabeled, max_entry, is_test=False):
 
     
     gen = DataGenerator([train_files], features, labels, spectators, batch_size=batch_size, n_dim=ntracks, 
+                                remove_mass_pt_window=remove_mass_pt_window, 
+                                remove_unlabeled=remove_unlabeled, max_entry=max_entry)
+    
+    val_gen = DataGenerator([val_files], features, labels, spectators, batch_size=batch_size, n_dim=ntracks, 
                                 remove_mass_pt_window=remove_mass_pt_window, 
                                 remove_unlabeled=remove_unlabeled, max_entry=max_entry)
     
@@ -55,7 +61,7 @@ def create_baseline_model(features, spectators, labels, nfeatures, nspectators, 
 
     # fit keras model, from 20 epochs to 300
     history_conv1d = keras_model_conv1d.fit(gen, 
-                                            validation_data = gen, 
+                                            validation_data = val_gen, 
                                             steps_per_epoch=len(gen), 
                                             validation_steps=len(gen),
                                             max_queue_size=5,
@@ -66,17 +72,12 @@ def create_baseline_model(features, spectators, labels, nfeatures, nspectators, 
     # reload best weights
     keras_model_conv1d.load_weights('keras_model_conv1d_best.h5')
 
-    plt.figure()
-    plt.plot(history_conv1d.history['loss'],label='Loss')
-    plt.plot(history_conv1d.history['val_loss'],label='Val. loss')
-    plt.xlabel('Epoch')
-    plt.legend()
-    plt.show()
-
-    #plt.savefig('data/visualizations/conv1d_loss.png')
-    visualize('conv1d_loss.png')
-    plt.savefig('test/conv1d_loss.png')
-
+    visualize_loss(history_conv1d)
+    
+    if is_test:
+        visualize('conv1d_loss.png', True)
+    else:
+        visualize('conv1d_loss.png', True)
 
     # COMPARING MODELS
     predict_array_dnn = []
@@ -103,17 +104,8 @@ def create_baseline_model(features, spectators, labels, nfeatures, nspectators, 
     fpr_cnn, tpr_cnn, threshold_cnn = roc_curve(label_array_test[:,1], predict_array_cnn[:,1])
 
     # plot ROC curves
-    plt.figure()
-    plt.plot(tpr_cnn, fpr_cnn, lw=2.5, label="Conv1D, AUC = {:.1f}%".format(auc(fpr_cnn,tpr_cnn)*100))
-    plt.xlabel(r'True positive rate')
-    plt.ylabel(r'False positive rate')
-    plt.semilogy()
-    plt.ylim(0.001,1)
-    plt.xlim(0,1)
-    plt.grid(True)
-    plt.legend(loc='upper left')
-    plt.show()
-
-    #plt.savefig('data/visualizations/conv1d.png')
-    visualize('conv1d.png')
-    plt.savefig('test/conv1d.png')
+    visualize_roc(fpr_cnn, tpr_cnn)
+    if is_test:
+        visualize('conv1d.png', True)
+    else:
+        visualize('conv1d.png')
