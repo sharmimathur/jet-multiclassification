@@ -73,8 +73,11 @@ def create_baseline_model(features, spectators, labels, nfeatures, nspectators, 
     keras_model_conv1d.load_weights('keras_model_conv1d_best.h5')
 
     visualize_loss(history_conv1d)
-    visualize('conv1d_loss.png')
-    visualize('conv1d_loss.png', True)
+    
+    if is_test:
+        visualize('conv1d_loss.png', True)
+    else:
+        visualize('conv1d_loss.png', True)
 
     # COMPARING MODELS
     predict_array_dnn = []
