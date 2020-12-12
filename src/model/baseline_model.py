@@ -21,10 +21,14 @@ from visualize import visualize_roc
 
 
     
-def create_baseline_model(features, spectators, labels, nfeatures, nspectators, nlabels, ntracks, sample_test_files, train_files, test_files, val_files, batch_size, remove_mass_pt_window, remove_unlabeled, max_entry):
+def create_baseline_model(features, spectators, labels, nfeatures, nspectators, nlabels, ntracks, sample_test_files, train_files, test_files, val_files, batch_size, remove_mass_pt_window, remove_unlabeled, max_entry, is_test=False):
 
     
     gen = DataGenerator([train_files], features, labels, spectators, batch_size=batch_size, n_dim=ntracks, 
+                                remove_mass_pt_window=remove_mass_pt_window, 
+                                remove_unlabeled=remove_unlabeled, max_entry=max_entry)
+    
+    val_gen = DataGenerator([val_files], features, labels, spectators, batch_size=batch_size, n_dim=ntracks, 
                                 remove_mass_pt_window=remove_mass_pt_window, 
                                 remove_unlabeled=remove_unlabeled, max_entry=max_entry)
     
@@ -57,7 +61,7 @@ def create_baseline_model(features, spectators, labels, nfeatures, nspectators, 
 
     # fit keras model, from 20 epochs to 300
     history_conv1d = keras_model_conv1d.fit(gen, 
-                                            validation_data = gen, 
+                                            validation_data = val_gen, 
                                             steps_per_epoch=len(gen), 
                                             validation_steps=len(gen),
                                             max_queue_size=5,
@@ -98,5 +102,7 @@ def create_baseline_model(features, spectators, labels, nfeatures, nspectators, 
 
     # plot ROC curves
     visualize_roc(fpr_cnn, tpr_cnn)
-    visualize('conv1d.png')
-    visualize('conv1d.png', True)
+    if is_test:
+        visualize('conv1d.png', True)
+    else:
+        visualize('conv1d.png')

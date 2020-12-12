@@ -1,10 +1,10 @@
 {
 	
-	"train_file_name": "test/testdata/test.root",
+	"train_files": "'root://eospublic.cern.ch//eos/opendata/cms/datascience/HiggsToBBNtupleProducerTool/HiggsToBBNTuple_HiggsToBB_QCD_RunII_13TeV_MC/test/ntuple_merged_0.root'",
     
-    "test_file_name": "/teams/DSC180A_FA20_A00/b06particlephysics/test/ntuple_merged_0.root",
+    "test_files": "'root://eospublic.cern.ch//eos/opendata/cms/datascience/HiggsToBBNtupleProducerTool/HiggsToBBNTuple_HiggsToBB_QCD_RunII_13TeV_MC/test/ntuple_merged_0.root'",
     
-    "val_file_name": "/teams/DSC180A_FA20_A00/b06particlephysics/train/ntuple_merged_11.root",
+    "val_files": "'root://eospublic.cern.ch//eos/opendata/cms/datascience/HiggsToBBNtupleProducerTool/HiggsToBBNTuple_HiggsToBB_QCD_RunII_13TeV_MC/test/ntuple_merged_0.root'",
     
     "batch_size": 1024,
 

@@ -38,7 +38,7 @@
            "sample_isQCD",
            "label_H_bb"],
 
-    "file_name": "test/testdata/test.root",
+    "file_name": "'root://eospublic.cern.ch//eos/opendata/cms/datascience/HiggsToBBNtupleProducerTool/HiggsToBBNTuple_HiggsToBB_QCD_RunII_13TeV_MC/test/ntuple_merged_0.root'",
     
     "remove_mass_pt_window":"False",
     

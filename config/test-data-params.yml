@@ -72,4 +72,4 @@ nlabels: 2
 ntracks: 60
 
 sample_test_files:
- - test/testdata/test.root
+ -root://eospublic.cern.ch//eos/opendata/cms/datascience/HiggsToBBNtupleProducerTool/HiggsToBBNTuple_HiggsToBB_QCD_RunII_13TeV_MC/test/ntuple_merged_0.root
