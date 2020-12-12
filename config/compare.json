@@ -23,8 +23,6 @@
                      "sv_mass",
                      "nsv"],
 
-	"entrystop": 20000,
-
 	"namedecode": "utf-8"
 
 

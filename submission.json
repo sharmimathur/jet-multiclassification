@@ -1,7 +1,4 @@
 {
-   "config": ["config/configurations.json", "config/data-params.json"],
-   "build": "run.py",
-   "library": ["src"],
-   "notebook": ["notebooks/sample.ipynb"],
-   "targets": ["run.py","src/data/etl.py"]
+   "dockerhub-id": "jmduarte/capstone-particle-physics-domain",
+   "repository-id": "https://github.com/DarrenChangSD/result-replication.git"
 }

@@ -16,8 +16,8 @@ from visualize import visualize_roc_compare
 
 
 
-def compare(file_name, features, spectators, labels, nlabels, remove_mass_pt_window=True, entrystop=None,
-           jet_features, track_features, sv_features, entrystop, namedecode):
+def compare(file_name, features, spectators, labels, nlabels, remove_mass_pt_window, entrystop,
+           jet_features, track_features, sv_features, namedecode):
     
     data = get_features_labels(file_name, features, spectators, labels, nlabels, remove_mass_pt_window=True, entrystop=None)
     features, labels, specs, tree = data
