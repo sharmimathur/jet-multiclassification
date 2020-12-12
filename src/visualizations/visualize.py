@@ -26,7 +26,7 @@ def visualize_loss(model):
     return None
     
 #used in src/model/baseline_model.py, src/model/model.py
-def visualize_roc(fpr_cnn, tpr_cnn, dense=False):
+def visualize_roc(fpr_cnn, tpr_cnn, fpr_dnn=None, tpr_dnn=None, dense=False):
     
     plt.figure()
     if dense:

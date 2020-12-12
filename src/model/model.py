@@ -4,6 +4,9 @@ import numpy as np
 
 import tensorflow.keras as keras
 from tensorflow import set_random_seed
+from tensorflow.keras.optimizers.schedules import ExponentialDecay
+from tensorflow.keras.callbacks import LearningRateScheduler
+from tensorflow.keras.optimizers import SGD
 import numpy as np
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
@@ -24,6 +27,7 @@ from visualize import visualize_roc
 #setting seeds for consistent results
 np.random.seed(1)
 set_random_seed(2)
+
 
 def create_models(features, spectators, labels, nfeatures, nspectators, nlabels, ntracks, train_files, test_files, val_files, batch_size, remove_mass_pt_window, remove_unlabeled, max_entry):
 
@@ -95,16 +99,14 @@ def create_models(features, spectators, labels, nfeatures, nspectators, nlabels,
     inputs = Input(shape=(ntracks,nfeatures,), name = 'input')  
     x = BatchNormalization(name='bn_1')(inputs)
     x = Conv1D(32, 1, strides=1, padding='same', name = 'conv1d_1', activation='relu')(x)
-    x = Conv1D(16, 1, strides=1, padding='same', name = 'conv1d_2', activation='relu')(x)
+    x = Conv1D(32, 1, strides=1, padding='same', name = 'conv1d_2', activation='relu')(x)
     x = Conv1D(16, 1, strides=1, padding='same', name = 'conv1d_3', activation='relu')(x)
-    x = Conv1D(8, 1, strides=1, padding='same', name = 'conv1d_4', activation='relu')(x)
     
     # sum over tracks
     x = GlobalAveragePooling1D(name='pool_1')(x)
-    x = Dense(100, name = 'dense_1', activation='relu')(x)
-    x = Dense(64, name = 'dense_2', activation='relu')(x)
-    x = Dense(32, name = 'dense_3', activation='relu')(x)
+    x = Dense(100, name = 'dense_1', activation='sigmoid')(x)
     outputs = Dense(nlabels, name = 'output', activation='softmax')(x)
+    
     
     keras_model_conv1d = Model(inputs=inputs, outputs=outputs)
     keras_model_conv1d.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
@@ -114,7 +116,15 @@ def create_models(features, spectators, labels, nfeatures, nspectators, nlabels,
     from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
     early_stopping = EarlyStopping(monitor='val_loss', patience=5)
-    reduce_lr = ReduceLROnPlateau(patience=5,factor=0.5)
+    
+    #defining learningrate decay model
+    num_epochs = 200
+    initial_learning_rate = 0.001
+    decay = initial_learning_rate / num_epochs
+    learn_rate_decay = lambda epoch, lr: lr * 1 / (1 + decay * epoch)
+    
+    #reduce_lr = ReduceLROnPlateau(patience=5,factor=0.5)
+    reduce_lr = LearningRateScheduler(learn_rate_decay)
     model_checkpoint = ModelCheckpoint('keras_model_conv1d_best.h5', monitor='val_loss', save_best_only=True)
     callbacks = [early_stopping, model_checkpoint, reduce_lr]
 
@@ -124,7 +134,7 @@ def create_models(features, spectators, labels, nfeatures, nspectators, nlabels,
                                             steps_per_epoch=len(train_generator), 
                                             validation_steps=len(val_generator),
                                             max_queue_size=5,
-                                            epochs=200, 
+                                            epochs=num_epochs, 
                                             shuffle=False,
                                             callbacks = callbacks, 
                                             verbose=0)
@@ -156,5 +166,5 @@ def create_models(features, spectators, labels, nfeatures, nspectators, nlabels,
     fpr_cnn, tpr_cnn, threshold_cnn = roc_curve(label_array_test[:,1], predict_array_cnn[:,1])
 
     # plot ROC curves
-    visualize_roc(fpr_cnn, tpr_cnn, True)
+    visualize_roc(fpr_cnn, tpr_cnn, fpr_dnn, tpr_dnn, True)
     visualize('fnn_vs_conv1d.png')
