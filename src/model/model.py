@@ -99,9 +99,11 @@ def create_models(features, spectators, labels, nfeatures, nspectators, nlabels,
     # define Deep Sets model with Conv1D Keras layer
     inputs = Input(shape=(ntracks,nfeatures,), name = 'input')  
     x = BatchNormalization(name='bn_1')(inputs)
-    #x = Conv1D(64, 1, strides=1, padding='same', name = 'conv1d_1', activation='relu')(x)
-    x = Conv1D(32, 1, strides=1, padding='same', name = 'conv1d_2', activation='relu')(x)
-    x = Conv1D(32, 1, strides=1, padding='same', name = 'conv1d_3', activation='relu')(x)
+    x = Conv1D(32, 1, strides=1, padding='same', name = 'conv1d_1', activation='relu')(x)
+    x = Conv1D(16, 1, strides=1, padding='same', name = 'conv1d_2', activation='relu')(x)
+    x = Conv1D(16, 1, strides=1, padding='same', name = 'conv1d_3', activation='relu')(x)
+    x = Conv1D(8, 1, strides=1, padding='same', name = 'conv1d_4', activation='relu')(x)
+    
     # sum over tracks
     x = GlobalAveragePooling1D(name='pool_1')(x)
     x = Dense(100, name = 'dense_1', activation='relu')(x)
