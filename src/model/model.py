@@ -1,7 +1,9 @@
 import sys
 import json
+import numpy as np
 
 import tensorflow.keras as keras
+from tensorflow import set_random_seed
 import numpy as np
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
@@ -19,9 +21,9 @@ from visualize import visualize
 from visualize import visualize_loss
 from visualize import visualize_roc
 
-from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda
-import tensorflow.keras.backend as K
+#setting seeds for consistent results
+np.random.seed(1)
+set_random_seed(2)
 
 def create_models(features, spectators, labels, nfeatures, nspectators, nlabels, ntracks, train_files, test_files, val_files, batch_size, remove_mass_pt_window, remove_unlabeled, max_entry):
 
@@ -38,6 +40,10 @@ def create_models(features, spectators, labels, nfeatures, nspectators, nlabels,
                                 remove_mass_pt_window=remove_mass_pt_window, 
                                 remove_unlabeled=remove_unlabeled, max_entry=max_entry)
     
+    
+    from tensorflow.keras.models import Model
+    from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda
+    import tensorflow.keras.backend as K
 
 
     # FULLY CONNECTED NEURAL NET CLASSIFIER
@@ -83,17 +89,21 @@ def create_models(features, spectators, labels, nfeatures, nspectators, nlabels,
     from tensorflow.keras.models import Model
     from tensorflow.keras.layers import Input, Dense, BatchNormalization, Conv1D, Flatten, Lambda, GlobalAveragePooling1D
     import tensorflow.keras.backend as K
+    
 
     # define Deep Sets model with Conv1D Keras layer
     inputs = Input(shape=(ntracks,nfeatures,), name = 'input')  
     x = BatchNormalization(name='bn_1')(inputs)
-    x = Conv1D(64, 1, strides=1, padding='same', name = 'conv1d_1', activation='relu')(x)
+    #x = Conv1D(64, 1, strides=1, padding='same', name = 'conv1d_1', activation='relu')(x)
     x = Conv1D(32, 1, strides=1, padding='same', name = 'conv1d_2', activation='relu')(x)
     x = Conv1D(32, 1, strides=1, padding='same', name = 'conv1d_3', activation='relu')(x)
     # sum over tracks
     x = GlobalAveragePooling1D(name='pool_1')(x)
     x = Dense(100, name = 'dense_1', activation='relu')(x)
+    x = Dense(64, name = 'dense_2', activation='relu')(x)
+    x = Dense(32, name = 'dense_3', activation='relu')(x)
     outputs = Dense(nlabels, name = 'output', activation='softmax')(x)
+    
     keras_model_conv1d = Model(inputs=inputs, outputs=outputs)
     keras_model_conv1d.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     print(keras_model_conv1d.summary())
@@ -112,7 +122,7 @@ def create_models(features, spectators, labels, nfeatures, nspectators, nlabels,
                                             steps_per_epoch=len(train_generator), 
                                             validation_steps=len(val_generator),
                                             max_queue_size=5,
-                                            epochs=20, 
+                                            epochs=200, 
                                             shuffle=False,
                                             callbacks = callbacks, 
                                             verbose=0)
